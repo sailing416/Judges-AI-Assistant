@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Judges Assistant – Under the Racing Rules of Sailing</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600;700&family=Source+Code+Pro:wght@500&display=swap');
+
+:root {
+  --navy:        #0a1628;
+  --navy-mid:    #1e3a5f;
+  --amber:       #d4a017;
+  --amber-bright:#ffd966;
+  --bg-page:     #f0f4f8;
+  --bg-white:    #ffffff;
+  --bg-alt:      #e8edf3;
+  --text-dark:   #0a1628;
+  --text-mid:    #1e3a5f;
+  --text-muted:  #4a5568;
+  --warn-bg:#fff0f0; --warn-border:#c0392b; --warn-text:#7b1d1d;
+  --info-bg:#e8f4fd; --info-border:#2980b9; --info-text:#1a4971;
+  --ok-bg:#eafaf1;   --ok-border:#27ae60;   --ok-text:#1a5c35;
+  --gold-bg:#fff8e1; --gold-border:#d4a017; --gold-text:#6b4d00;
+  --sidebar-w: 272px;
+  --header-h:  68px;
+  --radius:    10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body { font-family: 'Source Sans 3', sans-serif; background: var(--bg-page); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; -webkit-text-size-adjust: 100%; }
+
+/* HEADER */
+header { background: var(--navy); border-bottom: 3px solid var(--amber); padding: 0 20px; display: flex; align-items: center; justify-content: space-between; height: var(--header-h); position: sticky; top: 0; z-index: 300; box-shadow: 0 2px 14px rgba(0,0,0,0.4); flex-shrink: 0; }
+.header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.mobile-menu-btn { display: none; background: #1a3a5c; border: 2px solid var(--amber); border-radius: 7px; color: var(--amber-bright); font-size: 1.25rem; cursor: pointer; min-height: 44px; min-width: 44px; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; transition: background 0.15s; }
+.mobile-menu-btn:hover { background: #1e3a5f; }
+.anchor-icon { width: 40px; height: 40px; background: var(--amber); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; color: var(--navy); }
+header h1 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #ffffff; line-height: 1.25; min-width: 0; }
+header h1 .sub1 { display: block; font-size: 0.67rem; font-weight: 500; color: var(--amber-bright); font-family: 'Source Sans 3', sans-serif; letter-spacing: 0.07em; text-transform: uppercase; margin-top: 1px; }
+header h1 .sub2 { display: block; font-size: 0.62rem; font-weight: 500; color: #c8d8ec; font-family: 'Source Sans 3', sans-serif; letter-spacing: 0.03em; font-style: italic; }
+.header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.api-status { font-size: 0.78rem; font-weight: 700; color: var(--amber-bright); background: #1a3a5c; border: 2px solid var(--amber-bright); border-radius: 20px; padding: 6px 14px; cursor: pointer; transition: background 0.2s; white-space: nowrap; min-height: 38px; }
+.api-status:hover { background: #1e3a5f; }
+.api-status.connected { border-color: #2ecc71; color: #2ecc71; background: #0d2e1a; }
+
+/* LAYOUT */
+.app-layout { display: flex; flex: 1; overflow: hidden; height: calc(100vh - var(--header-h)); }
+
+/* LEFT SIDEBAR */
+nav.sidebar { width: var(--sidebar-w); background: var(--navy); border-right: 3px solid var(--amber); overflow-y: auto; flex-shrink: 0; padding-bottom: 24px; }
+.sidebar-brand { padding: 16px 18px 14px; border-bottom: 2px solid #1e3a5f; background: #060e1a; }
+.sidebar-brand-title { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: #ffffff; line-height: 1.3; }
+.sidebar-brand-sub { display: block; font-size: 0.65rem; color: var(--amber-bright); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 3px; }
+.sidebar-brand-author { display: block; font-size: 0.62rem; color: #c8d8ec; font-style: italic; margin-top: 2px; }
+.nav-section-label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber-bright); padding: 16px 18px 5px; font-weight: 700; border-top: 1px solid #1e3a5f; margin-top: 4px; }
+.nav-item { display: flex; align-items: center; gap: 11px; padding: 12px 18px; cursor: pointer; transition: background 0.15s, border-color 0.15s; font-size: 0.9rem; font-weight: 500; color: #dce8f5; border-left: 4px solid transparent; line-height: 1.3; min-height: 48px; }
+.nav-item:hover { background: #132340; color: #ffffff; border-left-color: rgba(212,160,23,0.5); }
+.nav-item.active { background: #1e3a5f; color: var(--amber-bright); border-left-color: var(--amber-bright); font-weight: 700; }
+.nav-item .icon { font-size: 1.1rem; width: 24px; text-align: center; flex-shrink: 0; line-height: 1; }
+
+/* MAIN CONTENT */
+main { flex: 1; overflow-y: auto; background: var(--bg-page); }
+.section { display: none; padding: 28px 36px; max-width: 900px; animation: fadeIn 0.25s ease; }
+.section.active { display: block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+
+/* RIGHT AI PANEL */
+.ai-panel { width: 350px; background: var(--navy); border-left: 3px solid var(--amber); display: flex; flex-direction: column; flex-shrink: 0; }
+.ai-panel-header { padding: 14px 18px; border-bottom: 3px solid var(--amber); background: #060e1a; }
+.ai-panel-header h3 { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--amber-bright); font-weight: 700; }
+.ai-panel-header p { font-size: 0.71rem; color: #c8d8ec; margin-top: 4px; line-height: 1.45; font-weight: 500; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #0d1e35; }
+.msg { padding: 11px 14px; border-radius: 9px; font-size: 0.875rem; line-height: 1.6; max-width: 97%; }
+.msg.system    { background: #1a3a5c; border: 2px solid var(--amber); color: #f0f6ff; align-self: flex-start; }
+.msg.user      { background: #1e3a5f; border: 2px solid #5a88bb; color: #ffffff; align-self: flex-end; }
+.msg.assistant { background: #102540; border: 2px solid #3d7bbf; color: #e8f2ff; align-self: flex-start; }
+.msg.loading   { background: #1a3a5c; border: 2px solid var(--amber); align-self: flex-start; padding: 12px 16px; }
+.typing-dots span { display: inline-block; width: 8px; height: 8px; background: var(--amber-bright); border-radius: 50%; margin: 0 3px; animation: bounce 1.2s infinite; }
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+
+/* AI PANEL — instruction box */
+.ai-instructions { background: #1a3a5c; border: 2px solid var(--amber); border-radius: 8px; padding: 11px 13px; }
+.ai-instructions-title { font-size: 0.74rem; font-weight: 700; color: var(--amber-bright); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+.ai-instructions p { font-size: 0.73rem; color: #d0e4f5; line-height: 1.5; margin: 0; }
+.ai-instructions-tip { margin-top: 6px; font-size: 0.7rem; color: var(--amber-bright); font-weight: 600; line-height: 1.45; border-top: 1px solid rgba(212,160,23,0.3); padding-top: 6px; }
+
+.chat-input-area { padding: 10px 12px; border-top: 2px solid #1e3a5f; display: flex; flex-direction: column; gap: 7px; background: #0a1628; }
+.quick-questions { display: flex; flex-wrap: wrap; gap: 5px; }
+.quick-q { font-size: 0.72rem; padding: 5px 10px; background: #1a3a5c; border: 2px solid var(--amber); border-radius: 20px; color: var(--amber-bright); cursor: pointer; transition: background 0.15s; font-weight: 700; min-height: 32px; line-height: 1.2; }
+.quick-q:hover { background: #1e3a5f; }
+.chat-input-row { display: flex; gap: 8px; }
+#chatInput { flex: 1; background: #1a2e48; border: 2px solid #5a88bb; border-radius: 8px; padding: 10px 13px; color: #ffffff; font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; resize: none; min-height: 44px; max-height: 100px; }
+#chatInput:focus { outline: none; border-color: var(--amber-bright); }
+#chatInput::placeholder { color: #7a98b8; }
+#sendBtn { background: var(--amber); border: none; border-radius: 8px; width: 48px; height: 48px; cursor: pointer; color: var(--navy); font-size: 1.15rem; font-weight: 700; transition: background 0.15s; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+#sendBtn:hover { background: var(--amber-bright); }
+#sendBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+.cost-note { font-size: 0.64rem; color: #8aaac8; text-align: center; line-height: 1.4; font-weight: 500; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 400; align-items: center; justify-content: center; padding: 16px; }
+.modal-overlay.open { display: flex; }
+.modal { background: #ffffff; border: 2px solid var(--amber); border-radius: var(--radius); padding: 28px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-family: 'Playfair Display', serif; color: var(--navy); margin-bottom: 10px; font-size: 1.3rem; }
+.modal p { font-size: 0.9rem; color: var(--text-mid); line-height: 1.6; margin-bottom: 12px; }
+.modal-steps { background: var(--bg-alt); border-left: 4px solid var(--navy-mid); border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 14px 0; font-size: 0.875rem; line-height: 1.7; color: var(--text-dark); }
+.modal-steps ol { padding-left: 18px; }
+.modal-steps li { margin-bottom: 4px; }
+.modal-steps a { color: var(--navy-mid); font-weight: 600; }
+.cost-info { background: var(--gold-bg); border: 1.5px solid var(--gold-border); border-radius: 8px; padding: 12px 14px; font-size: 0.85rem; margin-bottom: 16px; color: var(--gold-text); line-height: 1.55; }
+.cost-info strong { color: var(--navy); }
+#apiKeyInput { width: 100%; background: #f8fafc; border: 2px solid #b0c4d8; border-radius: 8px; padding: 11px 14px; color: var(--text-dark); font-family: 'Source Code Pro', monospace; font-size: 0.875rem; margin-bottom: 14px; }
+#apiKeyInput:focus { outline: none; border-color: var(--navy-mid); }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.btn { padding: 11px 22px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; font-weight: 700; transition: all 0.15s; min-height: 44px; }
+.btn-primary { background: var(--navy); color: #ffffff; }
+.btn-primary:hover { background: var(--navy-mid); }
+.btn-secondary { background: transparent; color: var(--text-mid); border: 2px solid #b0c4d8; }
+.btn-secondary:hover { border-color: var(--navy-mid); color: var(--navy); }
+
+/* CONTENT */
+.page-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; line-height: 1.2; }
+.page-subtitle { font-size: 0.82rem; color: var(--amber); margin-bottom: 24px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
+.rule-ref { display: inline-block; background: var(--navy); border-radius: 4px; padding: 1px 7px; font-size: 0.75rem; font-family: 'Source Code Pro', monospace; font-weight: 500; color: var(--amber-bright); margin-left: 4px; vertical-align: middle; }
+.card { background: var(--bg-white); border: 1.5px solid #c8d8e8; border-left: 4px solid var(--navy-mid); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(10,22,40,0.07); }
+.card:hover { border-left-color: var(--amber); }
+.card-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--navy); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; line-height: 1.3; }
+.card-title .badge { font-family: 'Source Sans 3', sans-serif; font-size: 0.68rem; background: var(--navy); color: var(--amber-bright); border-radius: 4px; padding: 2px 7px; font-weight: 700; letter-spacing: 0.06em; }
+p.body-text { font-size: 0.9rem; line-height: 1.7; color: var(--text-mid); margin-bottom: 8px; }
+
+.process-steps { counter-reset: step; list-style: none; margin: 14px 0; }
+.process-steps li { counter-increment: step; display: flex; gap: 12px; margin-bottom: 14px; font-size: 0.9rem; line-height: 1.6; color: var(--text-mid); align-items: flex-start; }
+.process-steps li::before { content: counter(step); background: var(--navy); color: var(--amber-bright); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; margin-top: 2px; }
+.step-content strong { display: block; color: var(--navy); font-weight: 700; margin-bottom: 2px; font-size: 0.93rem; }
+
+.checklist { list-style: none; margin: 10px 0; }
+.checklist li { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid #d8e4ee; font-size: 0.9rem; color: var(--text-dark); line-height: 1.5; cursor: pointer; min-height: 44px; }
+.checklist li:last-child { border-bottom: none; }
+.check-box { width: 24px; height: 24px; border: 2.5px solid var(--navy-mid); border-radius: 5px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #ffffff; background: transparent; transition: all 0.15s; margin-top: 1px; }
+.checklist li.checked .check-box { background: var(--navy); border-color: var(--navy); }
+.checklist li.checked { opacity: 0.55; }
+.checklist li.checked > span { text-decoration: line-through; }
+.reset-checklist { font-size: 0.82rem; color: var(--navy-mid); cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; font-weight: 600; min-height: 44px; line-height: 44px; }
+.reset-checklist:hover { color: var(--navy); }
+
+.tabs { display: flex; border-bottom: 2px solid #c8d8e8; margin-bottom: 22px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn { padding: 10px 16px; background: transparent; border: none; color: var(--text-muted); font-family: 'Source Sans 3', sans-serif; font-size: 0.875rem; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.18s; font-weight: 600; white-space: nowrap; min-height: 44px; }
+.tab-btn:hover { color: var(--navy); }
+.tab-btn.active { color: var(--navy); border-bottom-color: var(--amber); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.alert { padding: 13px 16px; border-radius: 8px; font-size: 0.875rem; line-height: 1.6; margin-bottom: 16px; display: flex; gap: 10px; align-items: flex-start; }
+.alert-icon { font-size: 1.05rem; flex-shrink: 0; margin-top: 1px; }
+.alert-warning { background: var(--warn-bg); border: 1.5px solid var(--warn-border); border-left: 4px solid var(--warn-border); color: var(--warn-text); }
+.alert-info    { background: var(--info-bg); border: 1.5px solid var(--info-border); border-left: 4px solid var(--info-border); color: var(--info-text); }
+.alert-success { background: var(--ok-bg);   border: 1.5px solid var(--ok-border);   border-left: 4px solid var(--ok-border);   color: var(--ok-text); }
+.alert-gold    { background: var(--gold-bg);  border: 1.5px solid var(--gold-border); border-left: 4px solid var(--gold-border); color: var(--gold-text); }
+
+.decision-form { display: grid; gap: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group label { display: block; font-size: 0.78rem; color: var(--navy); margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; background: #f8fafc; border: 2px solid #b0c4d8; border-radius: 7px; padding: 10px 13px; color: var(--text-dark); font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; transition: border-color 0.15s; min-height: 44px; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--navy-mid); background: #ffffff; }
+.form-group select option { background: #ffffff; color: var(--text-dark); }
+.form-group textarea { resize: vertical; min-height: 90px; }
+.radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
+.radio-label { display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 0.9rem; color: var(--text-dark); font-weight: 500; min-height: 36px; }
+.radio-label input { accent-color: var(--navy-mid); width: 18px; height: 18px; }
+
+.decision-output { background: #f0f4f8; border: 2px solid var(--navy-mid); border-radius: 10px; padding: 22px; font-size: 0.85rem; line-height: 1.8; white-space: pre-wrap; font-family: 'Source Code Pro', monospace; color: var(--text-dark); margin-top: 16px; position: relative; }
+.copy-btn { position: absolute; top: 12px; right: 12px; background: var(--navy); border: none; border-radius: 6px; padding: 6px 14px; color: var(--amber-bright); font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: background 0.15s; min-height: 36px; }
+.copy-btn:hover { background: var(--navy-mid); }
+
+.section-divider { border: none; border-top: 2px solid #d0dde8; margin: 24px 0; }
+h2.subsection { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+h3.sub-sub { font-size: 0.95rem; font-weight: 700; color: var(--navy-mid); margin-bottom: 8px; margin-top: 16px; }
+ul.body-list { padding-left: 20px; font-size: 0.9rem; line-height: 1.9; color: var(--text-mid); margin-bottom: 12px; }
+
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.compare-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 14px 0; min-width: 480px; }
+.compare-table th { background: var(--navy); color: var(--amber-bright); padding: 11px 14px; text-align: left; font-weight: 700; border-bottom: 3px solid var(--amber); white-space: nowrap; }
+.compare-table td { padding: 10px 14px; border-bottom: 1px solid #d0dde8; color: var(--text-mid); vertical-align: top; line-height: 1.5; }
+.compare-table tr:nth-child(even) td { background: var(--bg-alt); }
+.compare-table td:first-child { font-weight: 700; color: var(--navy); }
+.home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #b0c4d8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--navy-mid); }
+
+/* MOBILE NAV */
+.mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--navy); border-top: 3px solid var(--amber); z-index: 300; height: 62px; box-shadow: 0 -4px 20px rgba(0,0,0,0.5); }
+.mobile-nav-inner { display: flex; height: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.mobile-nav-inner::-webkit-scrollbar { display: none; }
+.mobile-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0 12px; cursor: pointer; flex-shrink: 0; min-width: 64px; border-top: 3px solid transparent; margin-top: -3px; transition: background 0.15s; -webkit-tap-highlight-color: transparent; }
+.mobile-nav-item:active { background: #1a3a5c; }
+.mobile-nav-item.active { border-top-color: var(--amber-bright); background: #1a3a5c; }
+.mobile-nav-item .mnav-icon { font-size: 1.25rem; line-height: 1; color: #dce8f5; }
+.mobile-nav-item.active .mnav-icon { color: var(--amber-bright); }
+.mobile-nav-item .mnav-label { font-size: 0.57rem; font-weight: 700; color: #8aaac8; text-transform: uppercase; letter-spacing: 0.04em; text-align: center; line-height: 1.2; }
+.mobile-nav-item.active .mnav-label { color: var(--amber-bright); }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; }
+.sidebar-overlay.open { display: block; }
+
+@media (max-width: 900px) { .ai-panel { display: none; } .section { padding: 20px 18px; } .home-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) {
+  :root { --header-h: 58px; }
+  header { padding: 0 10px; }
+  header h1 { font-size: 0.95rem; }
+  header h1 .sub1 { font-size: 0.6rem; }
+  header h1 .sub2 { display: none; }
+  .anchor-icon { width: 34px; height: 34px; font-size: 15px; }
+  .mobile-menu-btn { display: flex; }
+  nav.sidebar { position: fixed; top: 0; left: 0; width: min(300px,88vw); height: 100vh; z-index: 250; transform: translateX(-100%); transition: transform 0.25s ease; padding-top: calc(var(--header-h) + 4px); box-shadow: 4px 0 24px rgba(0,0,0,0.5); }
+  nav.sidebar.open { transform: translateX(0); }
+  .app-layout { height: calc(100vh - var(--header-h) - 62px); }
+  .mobile-nav { display: block; }
+  .section { padding: 16px 14px 20px; }
+  .page-title { font-size: 1.4rem; }
+  .page-subtitle { font-size: 0.75rem; margin-bottom: 18px; }
+  .form-row { grid-template-columns: 1fr; }
+  .tab-btn { padding: 9px 12px; font-size: 0.82rem; }
+  .card { padding: 14px 15px; }
+  p.body-text { font-size: 0.88rem; }
+  .checklist li { font-size: 0.88rem; padding: 12px 0; }
+  h2.subsection { font-size: 1.1rem; }
+  .alert { font-size: 0.85rem; padding: 11px 13px; }
+  .btn { font-size: 0.85rem; padding: 11px 16px; }
+  .modal { padding: 22px 18px; }
+}
+@media (max-width: 480px) {
+  .section { padding: 14px 12px 16px; }
+  .page-title { font-size: 1.25rem; }
+  .check-box { width: 22px; height: 22px; }
+  .modal-btns { flex-direction: column; }
+  .modal-btns .btn { width: 100%; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- API KEY MODAL -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal">
+    <h2>⚓ Set Your Anthropic API Key</h2>
+    <p>The Judges Assistant AI uses the Anthropic Claude API to answer your questions about the Racing Rules of Sailing, protest procedures, and more. You supply your own API key — queries go directly from your browser to Anthropic.</p>
+
+    <div class="modal-steps">
+      <strong style="color:var(--gold-light)">How to get an API key:</strong>
+      <ol>
+        <li>Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></li>
+        <li>Create a free account (or log in)</li>
+        <li>Navigate to <strong>API Keys</strong> → <strong>Create Key</strong></li>
+        <li>Copy the key (starts with <code>sk-ant-</code>) and paste it below</li>
+      </ol>
+    </div>
+
+    <div class="cost-info">
+      <strong>💡 About API costs:</strong><br>
+      This assistant uses the <strong>claude-sonnet-4-20250514</strong> model. Each question costs approximately <strong>USD $0.001–$0.005</strong> depending on length.<br><br>
+      <strong>All fees go directly to Anthropic</strong> (the AI research company that created Claude). This tool is provided free of charge by the author. Your API key is stored only in your browser's local memory for this session and is never transmitted anywhere except directly to Anthropic's servers.
+    </div>
+
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal()">Skip for now</button>
+      <button class="btn btn-primary" onclick="saveApiKey()">Save Key &amp; Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <div class="mobile-nav-item active" onclick="showSection('home');setMobileActive(this)"><span class="mnav-icon">🏠</span><span class="mnav-label">Home</span></div>
+    <div class="mobile-nav-item" onclick="showSection('protest-process');setMobileActive(this)"><span class="mnav-icon">📋</span><span class="mnav-label">Protest</span></div>
+    <div class="mobile-nav-item" onclick="showSection('protest-checklist');setMobileActive(this)"><span class="mnav-icon">✅</span><span class="mnav-label">P.List</span></div>
+    <div class="mobile-nav-item" onclick="showSection('redress-process');setMobileActive(this)"><span class="mnav-icon">⚖️</span><span class="mnav-label">Redress</span></div>
+    <div class="mobile-nav-item" onclick="showSection('redress-checklist');setMobileActive(this)"><span class="mnav-icon">✅</span><span class="mnav-label">R.List</span></div>
+    <div class="mobile-nav-item" onclick="showSection('appeals-process');setMobileActive(this)"><span class="mnav-icon">📜</span><span class="mnav-label">Appeals</span></div>
+    <div class="mobile-nav-item" onclick="showSection('appeals-checklist');setMobileActive(this)"><span class="mnav-icon">✅</span><span class="mnav-label">A.List</span></div>
+    <div class="mobile-nav-item" onclick="showSection('when-to-use');setMobileActive(this)"><span class="mnav-icon">🧭</span><span class="mnav-label">Which?</span></div>
+    <div class="mobile-nav-item" onclick="showSection('decision-writer');setMobileActive(this)"><span class="mnav-icon">✍️</span><span class="mnav-label">Decision</span></div>
+    <div class="mobile-nav-item" onclick="showSection('key-rules');setMobileActive(this)"><span class="mnav-icon">📖</span><span class="mnav-label">Rules</span></div>
+  </div>
+</nav>
+
+<header>
+  <div class="header-left">
+    <button class="mobile-menu-btn" id="menuBtn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+    <div class="anchor-icon">⚓</div>
+    <h1>
+      Judges Assistant
+      <span class="sub1">Under the Racing Rules of Sailing 2025–2028</span>
+      <span class="sub2">Author: John Golding</span>
+    </h1>
+  </div>
+  <div class="header-right">
+    <button class="api-status" id="apiStatusBtn" onclick="openModal()">🔑 Set API Key</button>
+  </div>
+</header>
+
+<!-- APP LAYOUT -->
+<div class="app-layout">
+
+  <!-- SIDEBAR NAV -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-title">⚓ Judges Assistant</div>
+      <span class="sidebar-brand-sub">Racing Rules of Sailing 2025–2028</span>
+      <span class="sidebar-brand-author">Author: John Golding</span>
+    </div>
+    <div class="nav-section-label">Start Here</div>
+    <div class="nav-item active" data-section="home" onclick="showSection('home')">
+      <span class="icon">🏠</span>
+      <span>Overview &amp; How to Use</span>
+    </div>
+
+    <div class="nav-section-label">Protest Hearing</div>
+    <div class="nav-item" data-section="protest-process" onclick="showSection('protest-process')">
+      <span class="icon">📋</span>
+      <span>Process &amp; Steps</span>
+    </div>
+    <div class="nav-item" data-section="protest-checklist" onclick="showSection('protest-checklist')">
+      <span class="icon">✅</span>
+      <span>Procedural Checklist</span>
+    </div>
+
+    <div class="nav-section-label">Redress</div>
+    <div class="nav-item" data-section="redress-process" onclick="showSection('redress-process')">
+      <span class="icon">⚖️</span>
+      <span>Process &amp; Steps</span>
+    </div>
+    <div class="nav-item" data-section="redress-checklist" onclick="showSection('redress-checklist')">
+      <span class="icon">✅</span>
+      <span>Procedural Checklist</span>
+    </div>
+
+    <div class="nav-section-label">Appeals</div>
+    <div class="nav-item" data-section="appeals-process" onclick="showSection('appeals-process')">
+      <span class="icon">📜</span>
+      <span>Process &amp; Steps</span>
+    </div>
+    <div class="nav-item" data-section="appeals-checklist" onclick="showSection('appeals-checklist')">
+      <span class="icon">✅</span>
+      <span>Procedural Checklist</span>
+    </div>
+    <div class="nav-section-label">When to Use</div>
+    <div class="nav-item" data-section="when-to-use" onclick="showSection('when-to-use')">
+      <span class="icon">🧭</span>
+      <span>Appeals vs Redress Guide</span>
+    </div>
+
+    <div class="nav-section-label">Written Decisions</div>
+    <div class="nav-item" data-section="decision-writer" onclick="showSection('decision-writer')">
+      <span class="icon">✍️</span>
+      <span>Decision Writer</span>
+    </div>
+    <div class="nav-item" data-section="decision-examples" onclick="showSection('decision-examples')">
+      <span class="icon">📄</span>
+      <span>Decision Examples</span>
+    </div>
+
+    <div class="nav-section-label">Reference</div>
+    <div class="nav-item" data-section="key-rules" onclick="showSection('key-rules')">
+      <span class="icon">📖</span>
+      <span>Key Rules Quick-Ref</span>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT AREA -->
+  <main id="mainContent">
+
+    <!-- HOME -->
+    <div class="section active" id="section-home">
+      <div class="page-title">Welcome, Judge</div>
+      <div class="page-subtitle">Your procedural guide to the Racing Rules of Sailing</div>
+
+      <div class="alert alert-gold">
+        <span class="alert-icon">⚓</span>
+        <div>This tool is built for judges at all levels — from club judge to international judge. It is designed to help you follow the correct process so you can focus on applying the rules. All content is drawn directly from the <strong>Racing Rules of Sailing 2025–2028 (RRS)</strong>, the <strong>World Sailing Case Book</strong>, the <strong>Judges' Manual</strong>, and <strong>Sail Canada Prescriptions 2025–2028</strong>. No alternative wording has been introduced.</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+        <div class="card" style="cursor:pointer" onclick="showSection('protest-process')">
+          <div class="card-title">📋 Protest Hearing <span class="badge">PROCESS</span></div>
+          <p class="body-text">Step-by-step from receiving a written protest to publishing the written decision. Includes validity, hearing, facts found, and rules applied.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showSection('redress-process')">
+          <div class="card-title">⚖️ Request for Redress <span class="badge">PROCESS</span></div>
+          <p class="body-text">How to handle a request for redress under rule 62, from receipt and validity through hearing and decision.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showSection('appeals-process')">
+          <div class="card-title">📜 Appeal <span class="badge">PROCESS</span></div>
+          <p class="body-text">The appeal process under rule 70 and Appendix R — who can appeal, how, timeframes, and how the appeal body reaches its decision.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showSection('when-to-use')">
+          <div class="card-title">🧭 Which Process? <span class="badge">GUIDE</span></div>
+          <p class="body-text">Not sure whether a matter calls for a protest, a request for redress, or an appeal? Use this decision guide.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showSection('decision-writer')">
+          <div class="card-title">✍️ Decision Writer <span class="badge">TOOL</span></div>
+          <p class="body-text">Enter your findings and the AI will draft a properly formatted written decision for protests, redress, or appeals.</p>
+        </div>
+        <div class="card" style="cursor:pointer" onclick="showSection('key-rules')">
+          <div class="card-title">📖 Key Rules <span class="badge">REFERENCE</span></div>
+          <p class="body-text">Quick-reference for the most commonly applied rules in hearings: Part 2 rules, timing, validity, and more.</p>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+      <h2 class="subsection">📌 How to Use the AI Assistant</h2>
+      <p class="body-text">The panel on the right is your AI assistant. Type any question about process, rules, or decision-making. The assistant is instructed to answer only from the RRS 2025–2028, the Judges' Manual, the World Sailing Case Book, and Sail Canada Prescriptions.</p>
+      <p class="body-text">To enable the AI, click <strong>"Set API Key"</strong> in the top right corner. You will need a free Anthropic account. Each question costs approximately <strong>USD $0.001–$0.005</strong>, billed directly to your Anthropic account. The author of this tool receives no fees.</p>
+
+      <div class="alert alert-info">
+        <span class="alert-icon">ℹ️</span>
+        <div><strong>Sail Canada Note:</strong> Sail Canada prescribes that no fee shall be charged for any procedure of the protest committee under Part 5 or Appendix T. <span class="rule-ref">Part 5 Prescription</span></div>
+      </div>
+    </div>
+
+    <!-- PROTEST PROCESS -->
+    <div class="section" id="section-protest-process">
+      <div class="page-title">Protest Hearing</div>
+      <div class="page-subtitle">From receipt of the protest to the written decision</div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'protest-overview')">Overview</button>
+        <button class="tab-btn" onclick="switchTab(this,'protest-validity')">1. Validity</button>
+        <button class="tab-btn" onclick="switchTab(this,'protest-hearing')">2. The Hearing</button>
+        <button class="tab-btn" onclick="switchTab(this,'protest-decision')">3. Decision</button>
+        <button class="tab-btn" onclick="switchTab(this,'protest-criteria')">Decision Criteria</button>
+      </div>
+
+      <div class="tab-content active" id="tab-protest-overview">
+        <div class="alert alert-gold">
+          <span class="alert-icon">⚓</span>
+          <div>A <strong>protest</strong> is an allegation by a boat that another boat has broken a rule. The protest committee decides whether a rule was broken and, if so, what penalty applies. The authority for protests is <span class="rule-ref">RRS Part 5</span>, principally rules <span class="rule-ref">61–66</span>.</div>
+        </div>
+
+        <h2 class="subsection">The Six Stages of a Protest Hearing</h2>
+        <ol class="process-steps">
+          <li><div class="step-content"><strong>Receipt of Written Protest (Rule 61.2)</strong>A party delivers the protest in writing. Check that the protest was lodged within the time limit and that it names the boat protested.</div></li>
+          <li><div class="step-content"><strong>Validity (Rule 63.5)</strong>The protest committee determines whether the protest is valid before proceeding to a hearing. A protest is invalid if any requirement of rule 61.2 is not met, unless the protest committee decides to waive the requirement.</div></li>
+          <li><div class="step-content"><strong>Notification (Rule 63.2)</strong>All parties must be notified: time and place of the hearing, and the rule(s) alleged to have been broken.</div></li>
+          <li><div class="step-content"><strong>The Hearing (Rule 63)</strong>Conducted in accordance with rule 63. Parties present their cases, witnesses may be called, the committee may take evidence from others.</div></li>
+          <li><div class="step-content"><strong>Finding Facts and Applying Rules (Rule 64)</strong>The committee finds the facts and applies the relevant rules. If a rule is found to have been broken, the committee imposes a penalty or takes other action.</div></li>
+          <li><div class="step-content"><strong>Written Decision (Rule 65.1)</strong>The decision, with the facts found, the rules that apply, and the decision, shall be made available in writing to the parties upon request.</div></li>
+        </ol>
+      </div>
+
+      <div class="tab-content" id="tab-protest-validity">
+        <h2 class="subsection">Step 1 — Validity of a Protest <span class="rule-ref">Rule 61.2 &amp; 63.5</span></h2>
+
+        <div class="alert alert-warning">
+          <span class="alert-icon">⚠️</span>
+          <div>The protest committee must determine validity before proceeding. If the protest is invalid, the hearing shall be closed. <span class="rule-ref">Rule 63.5</span></div>
+        </div>
+
+        <h3 class="sub-sub">Requirements for a Valid Protest (Rule 61.2)</h3>
+        <p class="body-text">A protest by a boat shall be in writing and include:</p>
+        <ul style="padding-left:20px; font-size:0.875rem; line-height:1.8; color:rgba(248,246,240,0.85); margin-bottom:14px;">
+          <li>the name of the protestor</li>
+          <li>the name of the boat protested</li>
+          <li>the incident, including where and when it occurred</li>
+          <li>the rule(s) believed to have been broken</li>
+          <li>the name and sail number, if known, of any witness the protestor intends to call</li>
+        </ul>
+
+        <h3 class="sub-sub">Time Limit <span class="rule-ref">Rule 61.3</span></h3>
+        <p class="body-text">A protest shall be delivered to the race office within the time limit set in the sailing instructions. If no time limit is set, the time limit is two hours after the last boat in the race finishes.</p>
+
+        <h3 class="sub-sub">Hail Requirement <span class="rule-ref">Rule 61.1(a)</span></h3>
+        <p class="body-text">A boat intending to protest shall hail "Protest" as soon as reasonably possible after the incident. When the incident is not seen by the helmsman of the protesting boat, she need not hail but shall attempt to inform the protested boat at the first reasonable opportunity.</p>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div><strong>Waiver of Requirements:</strong> When the protest committee is satisfied that the requirements of a rule have been met to the extent possible given the circumstances, it may waive strict compliance with rule 61.2. <span class="rule-ref">Rule 63.5</span></div>
+        </div>
+
+        <h3 class="sub-sub">If the Protest is Invalid</h3>
+        <p class="body-text">If the protest committee decides a protest is invalid, it shall so inform the parties and close the hearing. <span class="rule-ref">Rule 63.5</span>. The written decision should record: (a) the fact that the protest was invalid, and (b) the reason(s) for invalidity.</p>
+      </div>
+
+      <div class="tab-content" id="tab-protest-hearing">
+        <h2 class="subsection">Step 2 — Conducting the Hearing <span class="rule-ref">Rule 63</span></h2>
+
+        <h3 class="sub-sub">Right to be Present (Rule 63.2)</h3>
+        <p class="body-text">The parties to a protest are the protestor and the protestee. They, and any witnesses they call, are entitled to be present throughout the hearing. A party may have a representative present.</p>
+
+        <div class="alert alert-warning">
+          <span class="alert-icon">⚠️</span>
+          <div>A member of the protest committee who is involved in an incident being protested shall not take part in the hearing of that protest. <span class="rule-ref">Rule 63.4</span></div>
+        </div>
+
+        <h3 class="sub-sub">Order of the Hearing (Rule 63.3)</h3>
+        <ol class="process-steps">
+          <li><div class="step-content"><strong>Read the protest</strong>The chairman reads the protest aloud (or summarises the incident and rules alleged).</div></li>
+          <li><div class="step-content"><strong>Protestor presents case</strong>The protestor (or representative) describes the incident and may call witnesses.</div></li>
+          <li><div class="step-content"><strong>Protestee presents case</strong>The protestee (or representative) presents their version and may call witnesses. All parties may question each witness.</div></li>
+          <li><div class="step-content"><strong>Committee questions parties and witnesses</strong>The committee may ask questions at any time. If new evidence arises, parties must have the opportunity to respond.</div></li>
+          <li><div class="step-content"><strong>Parties and witnesses leave the room</strong>The committee deliberates in private.</div></li>
+          <li><div class="step-content"><strong>Find facts and apply rules</strong>The committee agrees on the facts found and which rule(s) apply.</div></li>
+          <li><div class="step-content"><strong>Announce the decision</strong>Parties are recalled and the decision is announced. The written decision is to be made available upon request.</div></li>
+        </ol>
+
+        <h3 class="sub-sub">Evidence and Diagrams (Rule 63.6)</h3>
+        <p class="body-text">The committee may accept any evidence it deems necessary. Conflicting evidence should be carefully assessed. A diagram of the incident should be prepared — ideally by each party separately, then reconciled by the committee.</p>
+
+        <h3 class="sub-sub">One Party Absent (Rule 63.3(b))</h3>
+        <p class="body-text">If a party to a hearing is not present, the committee may proceed with the hearing and the party is bound by the decision. If the protestee was not notified, the hearing shall be postponed.</p>
+      </div>
+
+      <div class="tab-content" id="tab-protest-decision">
+        <h2 class="subsection">Step 3 — The Decision <span class="rule-ref">Rules 64–65</span></h2>
+
+        <h3 class="sub-sub">Rule 64.1 — Penalties and Exoneration</h3>
+        <p class="body-text">When the protest committee decides that a boat that is a party to a protest has broken a rule and is not exonerated, it shall either disqualify her or impose another penalty if the rules so provide. Only one penalty shall be imposed on a boat for breaking one or more rules in an incident.</p>
+
+        <div class="alert alert-success">
+          <span class="alert-icon">✅</span>
+          <div><strong>Exoneration:</strong> A boat that breaks a rule of Part 2 while compelled to do so by another boat breaking a rule shall be exonerated. <span class="rule-ref">Rule 64.1(c)</span></div>
+        </div>
+
+        <h3 class="sub-sub">Rule 65.1 — Informing Parties of the Decision</h3>
+        <p class="body-text">After making its decision, the protest committee shall promptly inform the parties of the facts found, the rules that apply, and the decision. If requested, it shall give them the written decision with the reasons.</p>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div><strong>Sail Canada Prescription (Rule 65.1):</strong> A boat that has been found by a protest committee to have broken a rule and caused damage shall be considered at fault for the purposes of rule 65.1.</div>
+        </div>
+
+        <h3 class="sub-sub">What the Written Decision Must Contain</h3>
+        <ul style="padding-left:20px; font-size:0.875rem; line-height:1.9; color:rgba(248,246,240,0.85);">
+          <li>Event, date, race number</li>
+          <li>Names of protest committee members</li>
+          <li>Names of parties and their representatives</li>
+          <li>The facts found</li>
+          <li>The rules that apply</li>
+          <li>The decision (with reasons)</li>
+          <li>Signature of the chairman</li>
+          <li>Statement of the right of appeal (where applicable)</li>
+        </ul>
+      </div>
+
+      <div class="tab-content" id="tab-protest-criteria">
+        <h2 class="subsection">Decision-Making Criteria</h2>
+
+        <div class="card">
+          <div class="card-title">🔍 Burden and Standard of Proof</div>
+          <p class="body-text">There is no formal burden of proof on either party. The protest committee finds facts on the balance of probabilities — what is more likely to have happened. If the committee is unable to decide, the protest is dismissed. (<em>Judges' Manual</em>)</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">⚖️ Evaluating Conflicting Evidence</div>
+          <p class="body-text">When parties give conflicting accounts, the committee should:</p>
+          <ol class="process-steps">
+            <li><div class="step-content">Assess the consistency of each account with the physical facts.</div></li>
+            <li><div class="step-content">Consider whether each account is internally consistent.</div></li>
+            <li><div class="step-content">Assess the demeanour and credibility of witnesses.</div></li>
+            <li><div class="step-content">Consider independent evidence (video, GPS, third parties).</div></li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📐 Facts Found vs. Facts Alleged</div>
+          <p class="body-text">The protest committee is not bound by the facts alleged in the protest. It decides what actually happened. It then applies the rules to those facts. The committee may find that a different rule than the one alleged was broken, and may penalise accordingly. <span class="rule-ref">Rule 64.1</span></p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🚩 Rule Application</div>
+          <p class="body-text">Once facts are found, rule application is a matter of law. The committee should consult the Case Book for precedents. Cases decided by World Sailing are binding on all national authorities and their protest committees. <span class="rule-ref">RRS Introduction</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROTEST CHECKLIST -->
+    <div class="section" id="section-protest-checklist">
+      <div class="page-title">Protest — Procedural Checklist</div>
+      <div class="page-subtitle">Work through these steps in order. Click each item to mark it complete.</div>
+
+      <div class="alert alert-info">
+        <span class="alert-icon">ℹ️</span>
+        <div>This checklist covers the full protest hearing from receipt through written decision. Items are drawn from RRS rules 61–65 and the Judges' Manual. <a href="#" style="color:var(--gold-light)" onclick="resetChecklist('protest')">Reset checklist</a></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📥 Phase 1 — Receipt &amp; Preliminary Review</div>
+        <ul class="checklist" id="checklist-protest-1">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protest received in writing <span class="rule-ref">Rule 61.2</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protest delivered within time limit <span class="rule-ref">Rule 61.3</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protestor identified by name</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protestee identified by name/sail number</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Incident described (where and when)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Rule(s) alleged to have been broken stated</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>"Protest" hailed at first opportunity (or note why not required) <span class="rule-ref">Rule 61.1(a)</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Red flag displayed where required <span class="rule-ref">Rule 61.1(b)</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">✅ Phase 2 — Validity Determination <span class="rule-ref">Rule 63.5</span></div>
+        <ul class="checklist" id="checklist-protest-2">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>All requirements of rule 61.2 checked</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>If any requirement not met: consider whether to waive under rule 63.5</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Decision on validity recorded</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>If invalid: parties informed and hearing closed</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>If valid: proceed to scheduling the hearing</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📢 Phase 3 — Notification <span class="rule-ref">Rule 63.2</span></div>
+        <ul class="checklist" id="checklist-protest-3">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>All parties notified of time and place of hearing</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Parties informed of rule(s) alleged to be broken</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Parties given reasonable time to prepare <span class="rule-ref">Rule 63.2</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protest committee assembled — quorum confirmed <span class="rule-ref">Rule 91(a)</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>No committee member involved in the incident <span class="rule-ref">Rule 63.4</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎤 Phase 4 — Conducting the Hearing <span class="rule-ref">Rule 63</span></div>
+        <ul class="checklist" id="checklist-protest-4">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Parties and witnesses identified</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protest read aloud (or summarised to all parties)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protestor presents case; witnesses heard</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protestee presents case; witnesses heard</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>All parties given opportunity to question witnesses</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Committee questions parties and witnesses</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Diagrams prepared and agreed where possible <span class="rule-ref">Rule 63.6</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Parties and witnesses asked to leave for deliberation</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚖️ Phase 5 — Deliberation and Decision <span class="rule-ref">Rules 64–65</span></div>
+        <ul class="checklist" id="checklist-protest-5">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Facts found and recorded</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Rules applied to facts</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Case Book consulted where relevant</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>If rule broken: penalty or exoneration determined <span class="rule-ref">Rule 64.1</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Only one penalty per incident <span class="rule-ref">Rule 64.1</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Decision announced to parties</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Parties informed of right of appeal <span class="rule-ref">Rule 70</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Written decision prepared and available upon request <span class="rule-ref">Rule 65.1</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Sail Canada: No fee charged for any procedure <span class="rule-ref">SC Prescription Part 5</span></span></li>
+        </ul>
+      </div>
+      <span class="reset-checklist" onclick="resetAllChecklists('protest')">↺ Reset all protest checklists</span>
+    </div>
+
+    <!-- REDRESS PROCESS -->
+    <div class="section" id="section-redress-process">
+      <div class="page-title">Request for Redress</div>
+      <div class="page-subtitle">From receipt of the request to the written decision</div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'redress-overview')">Overview</button>
+        <button class="tab-btn" onclick="switchTab(this,'redress-grounds')">Grounds for Redress</button>
+        <button class="tab-btn" onclick="switchTab(this,'redress-hearing')">The Hearing</button>
+        <button class="tab-btn" onclick="switchTab(this,'redress-decision')">Decision</button>
+        <button class="tab-btn" onclick="switchTab(this,'redress-criteria')">Decision Criteria</button>
+      </div>
+
+      <div class="tab-content active" id="tab-redress-overview">
+        <div class="alert alert-gold">
+          <span class="alert-icon">⚖️</span>
+          <div>A <strong>request for redress</strong> is a request by a boat, or an action by the protest committee on its own initiative, to improve a boat's score or position in a race or series. The authority is <span class="rule-ref">Rule 62</span>. Redress is not a protest — no rule need have been broken by the boat seeking redress.</div>
+        </div>
+
+        <h2 class="subsection">The Five Stages of a Redress Hearing</h2>
+        <ol class="process-steps">
+          <li><div class="step-content"><strong>Receipt of Request or Own Initiative (Rule 62.2)</strong>A boat requests redress or the protest committee initiates the process on its own initiative. If initiated by a boat, the request must be in writing and within the time limit.</div></li>
+          <li><div class="step-content"><strong>Validity (Rule 63.5 applies by reference)</strong>The request must meet the requirements of rule 62. The protest committee must determine whether the request is valid before proceeding.</div></li>
+          <li><div class="step-content"><strong>Notification (Rule 63.2)</strong>All parties — the boat requesting redress and any other boats or persons who may be affected — must be notified of the time and place of the hearing.</div></li>
+          <li><div class="step-content"><strong>The Hearing (Rule 63)</strong>Conducted according to rule 63 in the same manner as a protest hearing, with parties presenting evidence.</div></li>
+          <li><div class="step-content"><strong>Decision (Rule 64.2)</strong>If the protest committee decides a boat is entitled to redress, it shall make as equitable an arrangement as possible for all boats affected.</div></li>
+        </ol>
+      </div>
+
+      <div class="tab-content" id="tab-redress-grounds">
+        <h2 class="subsection">Grounds for Redress <span class="rule-ref">Rule 62.1</span></h2>
+        <p class="body-text">A request for redress may only be made on one of the following grounds:</p>
+
+        <div class="card">
+          <div class="card-title">(a) Physical damage or injury from another boat that broke a rule</div>
+          <p class="body-text">The boat suffered physical damage or a person was injured as a result of the action of a boat that broke a rule of Part 2, a rule of Part 4, or rule 42.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">(b) Improper action or omission of the race committee</div>
+          <p class="body-text">The race committee or protest committee made an improper action or omission that significantly worsened the boat's score or finishing position through no fault of the boat or those aboard her. Example: an incorrect recall signal, a course error, or a scoring error.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">(c) Help to a person or vessel in danger</div>
+          <p class="body-text">The boat gave help to a person or vessel in danger. This includes stopping to assist under rule 1.1.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">(d) Injury or disability to a boat or person</div>
+          <p class="body-text">A boat suffered injury or disability as the result of an act by a person not racing that was beyond the boat's control. Example: a spectator boat causing a wash at a critical moment.</p>
+        </div>
+
+        <div class="alert alert-warning">
+          <span class="alert-icon">⚠️</span>
+          <div>Redress is <strong>not</strong> available merely because a boat was disadvantaged. There must be a qualifying event under rule 62.1(a)–(d). The boat's score or finishing position must have been significantly worsened.</div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-redress-hearing">
+        <h2 class="subsection">Conducting the Redress Hearing <span class="rule-ref">Rules 62–63</span></h2>
+        <p class="body-text">A redress hearing follows the same procedural rules as a protest hearing. Rules 63.2–63.6 apply. The key differences are:</p>
+
+        <div class="card">
+          <div class="card-title">Who are the parties?</div>
+          <p class="body-text">The boat requesting redress is a party. If the request arises under rule 62.1(b) (improper action of the race committee), the race committee is a party. Any boats whose scores may be affected if redress is granted may be considered parties and should be notified.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Own-Initiative Hearings <span class="rule-ref">Rule 60.2(b)</span></div>
+          <p class="body-text">The protest committee may initiate a redress hearing on its own initiative. This power should be used when the committee becomes aware of a scoring or procedural error that may have significantly affected a boat's result without that boat having requested redress.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Evidence Specific to Redress</div>
+          <p class="body-text">The committee should gather evidence of: (1) the event giving rise to the request; (2) the boat's score or position but for the event; (3) the boat's actual score or position; (4) any effect of granting redress on other boats.</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-redress-decision">
+        <h2 class="subsection">The Redress Decision <span class="rule-ref">Rule 64.2</span></h2>
+
+        <h3 class="sub-sub">Two-Stage Decision</h3>
+        <p class="body-text">The committee must first decide whether redress is <em>deserved</em> (i.e., whether the conditions of rule 62.1 are met), and then determine what redress is appropriate.</p>
+
+        <div class="card">
+          <div class="card-title">Stage 1 — Is the Boat Entitled to Redress?</div>
+          <p class="body-text">The committee must find: (a) that one of the grounds in rule 62.1 applies; (b) that the boat's score or finishing position was significantly worsened; and (c) that this was through no fault of the boat or those aboard.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Stage 2 — What Redress is Appropriate?</div>
+          <p class="body-text">Rule 64.2 requires the committee to make <em>as equitable an arrangement as possible for all boats affected</em>. Common forms of redress include:</p>
+          <ul style="padding-left:18px; font-size:0.875rem; line-height:1.8; color:rgba(248,246,240,0.8); margin-top:8px;">
+            <li>Awarding a points score (e.g., average of the boat's other races)</li>
+            <li>Awarding the position the boat would have achieved</li>
+            <li>Abandoning the race for all boats</li>
+            <li>Adjusting time allowances</li>
+          </ul>
+        </div>
+
+        <div class="alert alert-success">
+          <span class="alert-icon">✅</span>
+          <div><strong>Key Principle:</strong> The committee should aim for equity — the arrangement that most closely restores the boat to the position it would have been in, while not unfairly disadvantaging other boats.</div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-redress-criteria">
+        <h2 class="subsection">Decision Criteria — Redress</h2>
+
+        <div class="card">
+          <div class="card-title">🔍 Was the Score Significantly Worsened?</div>
+          <p class="body-text">The worsening must be significant. A minor effect on the boat's score is insufficient. The committee should compare what score or position the boat would have achieved but for the qualifying event.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🚫 Fault of the Boat</div>
+          <p class="body-text">Redress is not available if the boat or those aboard were at fault for the worsening. The test is whether those aboard acted reasonably in the circumstances.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">⚖️ Equitable Arrangement</div>
+          <p class="body-text">The committee has broad discretion in fashioning redress, but must consider the effect on all boats. Simply awarding first place to the requesting boat is seldom appropriate without thorough analysis of all boats' interests.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📖 Case Book Guidance</div>
+          <p class="body-text">Consult the World Sailing Case Book for guidance on equitable arrangements. Cases such as WS Case 89 and WS Case 119 address common redress scenarios.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- REDRESS CHECKLIST -->
+    <div class="section" id="section-redress-checklist">
+      <div class="page-title">Redress — Procedural Checklist</div>
+      <div class="page-subtitle">Work through these steps in order. Click each item to mark it complete.</div>
+
+      <div class="card">
+        <div class="card-title">📥 Phase 1 — Receipt &amp; Review <span class="rule-ref">Rule 62</span></div>
+        <ul class="checklist" id="checklist-redress-1">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Request received in writing (or committee acting on own initiative under rule 60.2(b))</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Request delivered within the time limit <span class="rule-ref">Rule 62.2</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Requesting boat identified</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Ground for redress identified (rule 62.1(a), (b), (c) or (d))</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Claim that score/position was significantly worsened noted</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">✅ Phase 2 — Validity</div>
+        <ul class="checklist" id="checklist-redress-2">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Ground under rule 62.1 established</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Time limit checked</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>If invalid: parties informed; hearing closed</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>If valid: proceed to scheduling</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📢 Phase 3 — Notification <span class="rule-ref">Rule 63.2</span></div>
+        <ul class="checklist" id="checklist-redress-3">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Requesting boat notified of hearing time/place</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Race committee notified if rule 62.1(b) is involved</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>All boats whose scores may be affected notified</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>No committee member involved in the incident <span class="rule-ref">Rule 63.4</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎤 Phase 4 — Conducting the Hearing <span class="rule-ref">Rule 63</span></div>
+        <ul class="checklist" id="checklist-redress-4">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Request read aloud or summarised</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Requesting boat presents case and evidence</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Race committee (if party) presents case</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Other affected boats heard</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Committee questions parties</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Parties asked to leave for deliberation</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚖️ Phase 5 — Decision <span class="rule-ref">Rule 64.2</span></div>
+        <ul class="checklist" id="checklist-redress-5">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Stage 1: Is the boat entitled to redress? (Rule 62.1 grounds met; score significantly worsened; no fault of boat)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Stage 2: What is the most equitable arrangement for all boats affected?</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Redress awarded or request dismissed</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Decision announced to parties</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Parties informed of right of appeal</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Written decision prepared and available upon request</span></li>
+        </ul>
+      </div>
+      <span class="reset-checklist" onclick="resetAllChecklists('redress')">↺ Reset all redress checklists</span>
+    </div>
+
+    <!-- APPEALS PROCESS -->
+    <div class="section" id="section-appeals-process">
+      <div class="page-title">Appeals</div>
+      <div class="page-subtitle">Process from lodging an appeal to the written decision</div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'appeal-overview')">Overview</button>
+        <button class="tab-btn" onclick="switchTab(this,'appeal-validity')">Validity &amp; Standing</button>
+        <button class="tab-btn" onclick="switchTab(this,'appeal-process')">The Process</button>
+        <button class="tab-btn" onclick="switchTab(this,'appeal-decision')">The Decision</button>
+        <button class="tab-btn" onclick="switchTab(this,'appeal-criteria')">Decision Criteria</button>
+      </div>
+
+      <div class="tab-content active" id="tab-appeal-overview">
+        <div class="alert alert-gold">
+          <span class="alert-icon">📜</span>
+          <div>An <strong>appeal</strong> is a request to the national authority (Sail Canada in Canada) to review a decision of a protest committee on a question of the application of the rules. Appeals are governed by <span class="rule-ref">Rule 70</span> and <span class="rule-ref">Appendix R</span>. In Canada, submit to: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5736272732363b241724363e3b3e3930793436">[email&#160;protected]</a></strong></div>
+        </div>
+
+        <div class="alert alert-warning">
+          <span class="alert-icon">⚠️</span>
+          <div><strong>Important:</strong> An appeal is <em>not</em> a new hearing of the facts. The appeal body does not re-hear witnesses. It reviews the protest committee's <strong>application of the rules</strong> to the facts found. <span class="rule-ref">Rule 71.3 &amp; Appendix R</span></div>
+        </div>
+
+        <h2 class="subsection">Who Can Appeal?</h2>
+        <p class="body-text">Under rule 70.1, a party to a protest or request for redress may appeal a decision of the protest committee on a question of the application of the rules, provided that there is no no-appeal protest committee or international jury in place for the event.</p>
+
+        <h3 class="sub-sub">When Appeals Are Not Allowed <span class="rule-ref">Rule 70.4</span></h3>
+        <ul style="padding-left:18px; font-size:0.875rem; line-height:1.8; color:rgba(248,246,240,0.8); margin-top:8px;">
+          <li>When the sailing instructions state that the protest committee is a no-appeal protest committee</li>
+          <li>When an international jury has been appointed</li>
+          <li>When the protest committee's decision is on a question of fact (not rule application)</li>
+          <li>When the time limit for appeal has expired</li>
+        </ul>
+      </div>
+
+      <div class="tab-content" id="tab-appeal-validity">
+        <h2 class="subsection">Validity and Standing to Appeal <span class="rule-ref">Rules 70–71 &amp; Appendix R</span></h2>
+
+        <h3 class="sub-sub">Who Has Standing?<e protestor, the protestee, or in a redress hearing, the requesting boat and any other parties to that hearing.</p>
+
+        <h3 class="sub-sub">Grounds for Appeal <span class="rule-ref">Rule 70.1</span></h3>
+        <div class="card">
+          <p class="body-text">An appeal may only be made on a question of the <strong>application of the rules</strong>. The appeal body does not reconsider factual findings unless the facts found are self-contradictory or inadequate to support the decision reached.</p>
+        </div>
+
+        <h3 class="sub-sub">Time Limit <span class="rule-ref">Appendix R, Rule R1.3</span></h3>
+        <p class="body-text">An appeal shall be lodged within 15 days of the receipt of the written decision. (Check applicable sailing instructions for event-specific time limits.)</p>
+
+        <h3 class="sub-sub">Requirement to Provide <span class="rule-ref">Appendix R, Rule R2</span></h3>
+        <p class="body-text">The appellant shall provide: (a) a copy of the written protest or request; (b) the written decision; (c) a diagram of the incident if one was prepared; (d) a statement of the grounds of appeal.</p>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div><strong>Sail Canada Prescription (Rule 70.3(b)):</strong> Sail Canada so prescribes. This means that a party to a hearing may also request the national authority to review whether a protest committee followed the rules of Part 5 (procedural requirements).</div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-appeal-process">
+        <h2 class="subsection">The Appeal Process <span class="rule-ref">Appendix R</span></h2>
+
+        <ol class="process-steps">
+          <li><div class="step-content"><strong>Lodge the Appeal (Appendix R, Rule R1)</strong>The appellant submits the appeal in writing to Sail Canada at appeals@sailing.ca within 15 days of receipt of the written decision.</div></li>
+          <li><div class="step-content"><strong>Acknowledgment and Notification (Rule R3)</strong>The national authority acknowledges receipt and notifies the other parties that an appeal has been lodged.</div></li>
+          <li><div class="step-content"><strong>Protest Committee Response (Rule R3)</strong>The protest committee is invited to comment on the appeal. All parties may respond to each other's submissions.</div></li>
+          <li><div class="step-content"><strong>Review of the Record (Rule R4)</strong>The appeal body reviews the written record: the protest, the written decision, any diagrams, the facts found, and the parties' submissions. It does not hear new evidence on the facts.</div></li>
+          <li><div class="step-content"><strong>Decision (Rule 71)</strong>The appeal body may uphold the protest committee's decision, change it, or refer it back with instructions. It shall give its reasons in writing.</div></li>
+          <li><div class="step-content"><strong>The Decision is Final (Rule 71.4)</strong>The decision of the national authority on an appeal is final and shall not be appealed further (subject to the Sail Canada prescription allowing appeal to Sail Canada from a provincial appeals committee).</div></li>
+        </ol>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div><strong>Sail Canada Prescription (Appendix R):</strong> Sail Canada may delegate the responsibilities in rules 71.2–71.5, R3, R4 and R5 to a provincial appeals committee. Decisions of a provincial appeals committee may be further appealed to Sail Canada.</div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-appeal-decision">
+        <h2 class="subsection">The Appeal Decision <span class="rule-ref">Rule 71</span></h2>
+
+        <h3 class="sub-sub">What the Appeal Body May Do <span class="rule-ref">Rule 71.2</span></h3>
+        <div class="card">
+          <p class="body-text">The national authority may:</p>
+          <ul style="padding-left:18px; font-size:0.875rem; line-height:1.9; color:rgba(248,246,240,0.8); margin-top:8px;">
+            <li><strong>Uphold</strong> the protest committee's decision</li>
+            <li><strong>Change</strong> the decision (including a change to the penalty)</li>
+            <li><strong>Refer</strong> the protest back to the protest committee with instructions to hold a new hearing or to decide specific questions</li>
+          </ul>
+        </div>
+
+        <h3 class="sub-sub">Finality <span class="rule-ref">Rule 71.4</span></h3>
+        <p class="body-text">The decision of the national authority on an appeal is final and may not be appealed further (except where Sail Canada's prescription allows further appeal from a provincial appeals committee to Sail Canada).</p>
+
+        <h3 class="sub-sub">Written Decision Requirements</h3>
+        <p class="body-text">The written decision of the appeal body shall include: (a) the facts as found by the protest committee; (b) the question(s) on appeal; (c) the analysis and reasons; (d) the decision.</p>
+      </div>
+
+      <div class="tab-content" id="tab-appeal-criteria">
+        <h2 class="subsection">Decision Criteria — Appeals</h2>
+
+        <div class="card">
+          <div class="card-title">🔍 Scope of Review</div>
+          <p class="body-text">The appeal body does not disturb findings of fact unless they are self-contradictory, or the facts found are inadequate to support the legal conclusion reached. The appeal body reviews only the <strong>application of the rules</strong> to the facts found.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📐 Adequacy of Facts Found</div>
+          <p class="body-text">If the facts found by the protest committee are insufficient to allow the appeal body to decide the question of rule application, the appeal body may refer the matter back to the protest committee to find additional facts. It does not find its own facts.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📖 World Sailing Cases</div>
+          <p class="body-text">The appeal body shall have regard to the World Sailing Case Book. Cases decided by World Sailing are binding on all national authorities and their protest committees. <span class="rule-ref">RRS Introduction</span></p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">⚖️ Procedural Fairness</div>
+          <p class="body-text">If a party was not given the opportunity to be present or to present its case, the appeal body may set aside the protest committee's decision on grounds of procedural unfairness and refer the matter back for a new hearing.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- APPEALS CHECKLIST -->
+    <div class="section" id="section-appeals-checklist">
+      <div class="page-title">Appeals — Procedural Checklist</div>
+      <div class="page-subtitle">For protest committee members assisting with appeal preparation</div>
+
+      <div class="card">
+        <div class="card-title">📥 Phase 1 — Post-Decision Obligations (Protest Committee)</div>
+        <ul class="checklist" id="checklist-appeal-1">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Written decision prepared and given to parties on request <span class="rule-ref">Rule 65.1</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Parties informed of right of appeal and time limit <span class="rule-ref">Rule 70</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protest committee informed whether a no-appeal or international jury was appointed</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>All documents retained: protest form, diagram, witnesses' accounts, decision</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📬 Phase 2 — Receipt of Appeal (National Authority / Provincial Committee)</div>
+        <ul class="checklist" id="checklist-appeal-2">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Appeal received in writing at appeals@sailing.ca</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Appeal lodged within 15 days of receipt of written decision <span class="rule-ref">Rule R1.3</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Appellant is a party to the original hearing <span class="rule-ref">Rule 70.1</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>No no-appeal committee or international jury was in place <span class="rule-ref">Rule 70.4</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Appeal identifies a question of <em>rule application</em> (not pure fact)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Copy of original protest or request provided <span class="rule-ref">Rule R2</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Written decision of protest committee provided</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Diagram (if any) provided</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Grounds of appeal stated</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔄 Phase 3 — Consultation and Review <span class="rule-ref">Rules R3–R4</span></div>
+        <ul class="checklist" id="checklist-appeal-3">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Other parties notified of the appeal <span class="rule-ref">Rule R3</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Protest committee invited to comment <span class="rule-ref">Rule R3</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>All parties given opportunity to respond to submissions</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Appeal body reviews the record — no new fact witnesses</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>World Sailing Case Book consulted</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>If facts inadequate: consider referral back to protest committee</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚖️ Phase 4 — Decision <span class="rule-ref">Rule 71</span></div>
+        <ul class="checklist" id="checklist-appeal-4">
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Question(s) on appeal clearly identified</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Analysis of rule application recorded</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Decision: uphold, change, or refer back</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Written decision with reasons provided to all parties <span class="rule-ref">Rule 71.3</span></span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box"></div><span>Decision stated as final (subject to any further appeal to Sail Canada from provincial committee)</span></li>
+        </ul>
+      </div>
+      <span class="reset-checklist" onclick="resetAllChecklists('appeal')">↺ Reset all appeal checklists</span>
+    </div>
+
+    <!-- WHEN TO USE -->
+    <div class="section" id="section-when-to-use">
+      <div class="page-title">Appeals vs. Redress — Which Process?</div>
+      <div class="page-subtitle">Guidance on when each procedure is appropriate</div>
+
+      <div class="alert alert-gold">
+        <span class="alert-icon">🧭</span>
+        <div>This guide is to help you determine which procedure is appropriate in a given situation. Using the wrong procedure will result in the matter being dismissed or referred to the correct process.</div>
+      </div>
+
+      <table class="compare-table">
+        <tr>
+          <th>Factor</th>
+          <th>Protest <span class="rule-ref">Rule 61</span></th>
+          <th>Redress <span class="rule-ref">Rule 62</span></th>
+          <th>Appeal <span class="rule-ref">Rule 70</span></th>
+        </tr>
+        <tr>
+          <td><strong>What is being challenged?</strong></td>
+          <td>An alleged breach of a racing rule by another boat in a race</td>
+          <td>A significant worsening of a boat's score due to one of the rule 62.1 grounds</td>
+          <td>A protest committee's application of the rules to the facts it found</td>
+        </tr>
+        <tr>
+          <td><strong>Who initiates?</strong></td>
+          <td>A boat that was a party to the incident, or the race/protest committee</td>
+          <td>A boat seeking redress, or the protest committee on its own initiative</td>
+          <td>A party to the original hearing</td>
+        </tr>
+        <tr>
+          <td><strong>Is a rule breach required?</strong></td>
+          <td>Yes — a rule must be alleged</td>
+          <td>Not necessarily — the boat's own score is affected through no fault of its own</td>
+          <td>N/A — the question is whether the committee applied the rules correctly</td>
+        </tr>
+        <tr>
+          <td><strong>When?</strong></td>
+          <td>Within the protest time limit after the race</td>
+          <td>Within the time limit after knowing the grounds (rule 62.2)</td>
+          <td>Within 15 days of receiving the written decision</td>
+        </tr>
+        <tr>
+          <td><strong>Who hears it?</strong></td>
+          <td>Protest committee</td>
+          <td>Protest committee</td>
+          <td>National authority (Sail Canada) or provincial appeals committee</td>
+        </tr>
+        <tr>
+          <td><strong>Facts re-heard?</strong></td>
+          <td>Yes — full hearing of evidence</td>
+          <td>Yes — full hearing of evidence</td>
+          <td>No — only the written record is reviewed</td>
+        </tr>
+        <tr>
+          <td><strong>Result</strong></td>
+          <td>Penalty, exoneration, or dismissal</td>
+          <td>Equitable arrangement or dismissal</td>
+          <td>Uphold, change decision, or refer back</td>
+        </tr>
+      </table>
+
+      <hr class="section-divider">
+      <h2 class="subsection">Common Scenarios and the Correct Process</h2>
+
+      <div class="card">
+        <div class="card-title">Scenario 1 — Boat A believes Boat B broke rule 11 (windward/leeward)</div>
+        <p class="body-text">→ <strong>Protest</strong> under rule 61. Boat A must hail "Protest", display a flag if required, and deliver a written protest within the time limit.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Scenario 2 — Boat C was recalled incorrectly by the race committee</div>
+        <p class="body-text">→ <strong>Request for Redress</strong> under rule 62.1(b). The race committee made an improper action that significantly worsened Boat C's score through no fault of Boat C.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Scenario 3 — Boat D stopped to assist a capsized sailor and finished last</div>
+        <p class="body-text">→ <strong>Request for Redress</strong> under rule 62.1(c). Boat D gave help to a person in danger under rule 1.1.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Scenario 4 — Boat E was penalised but believes the committee misapplied rule 15</div>
+        <p class="body-text">→ <strong>Appeal</strong> under rule 70. Boat E is a party to the protest hearing, and the question is whether the committee correctly applied rule 15 to the facts it found.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Scenario 5 — Boat F believes the protest committee made an error of procedure</div>
+        <p class="body-text">→ <strong>Appeal</strong> under rule 70.3(b) (Sail Canada prescription). A party may request the national authority to review whether the protest committee followed the requirements of Part 5.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Scenario 6 — Boat G was damaged by a spectator powerboat</div>
+        <p class="body-text">→ <strong>Request for Redress</strong> under rule 62.1(d). Boat G suffered an act by a person not racing that was beyond its control.</p>
+      </div>
+    </div>
+
+    <!-- DECISION WRITER -->
+    <div class="section" id="section-decision-writer">
+      <div class="page-title">Written Decision Writer</div>
+      <div class="page-subtitle">Enter the details of your hearing — the AI will draft the written decision</div>
+
+      <div class="alert alert-gold">
+        <span class="alert-icon">📋</span>
+        <div>
+          <strong>Two ways to produce a written decision:</strong><br><br>
+          <strong>1. Generate Written Decision</strong> — fills in the standard rule 65.1 format instantly using exactly what you entered. No AI required. Use this for a clean, properly structured draft.<br><br>
+          <strong>2. 🤖 AI-Enhanced Version</strong> — produces a <em>separate second version</em> of your decision. The AI reviews your Facts Found, Rules Applied, and Conclusion and rewrites them using the precise wording and legal structure recommended for written decisions under the RRS. <strong>Your facts and outcome are not changed</strong> — only the language is refined. The result appears in the AI panel on the right. Requires API key.
+        </div>
+      </div>
+
+      <div class="decision-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Event Name</label>
+            <input type="text" id="dec-event" placeholder="e.g. Laser Fleet Championship 2025">
+          </div>
+          <div class="form-group">
+            <label>Race Number(s)</label>
+            <input type="text" id="dec-race" placeholder="e.g. Race 3">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="dec-date">
+          </div>
+          <div class="form-group">
+            <label>Type of Hearing</label>
+            <select id="dec-type">
+              <option value="protest">Protest</option>
+              <option value="redress">Request for Redress</option>
+              <option value="appeal">Appeal</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Protestor / Requesting Boat</label>
+            <input type="text" id="dec-protestor" placeholder="Sail number and name">
+          </div>
+          <div class="form-group">
+            <label>Protestee / Responding Party</label>
+            <input type="text" id="dec-protestee" placeholder="Sail number and name">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Protest Committee Members</label>
+          <input type="text" id="dec-committee" placeholder="e.g. John Smith (Chairman), Jane Doe, Bob Jones">
+        </div>
+        <div class="form-group">
+          <label>Rule(s) Alleged</label>
+          <input type="text" id="dec-rules-alleged" placeholder="e.g. Rule 11, Rule 14">
+        </div>
+        <div class="form-group">
+          <label>Facts Found</label>
+          <textarea id="dec-facts" rows="5" placeholder="Describe the facts as the committee found them — positions, speeds, courses, key moments..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Rules Applied</label>
+          <textarea id="dec-rules-applied" rows="3" placeholder="Which rules apply to the facts found? Quote or paraphrase the relevant rules."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Conclusion / Decision</label>
+          <textarea id="dec-conclusion" rows="3" placeholder="e.g. Boat GBR 123 broke rule 11. Boat GBR 123 is disqualified from Race 3."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Outcome</label>
+          <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="dec-outcome" value="upheld"> Protest Upheld</label>
+            <label class="radio-label"><input type="radio" name="dec-outcome" value="dismissed"> Protest Dismissed</label>
+            <label class="radio-label"><input type="radio" name="dec-outcome" value="invalid"> Invalid</label>
+            <label class="radio-label"><input type="radio" name="dec-outcome" value="redress-granted"> Redress Granted</label>
+            <label class="radio-label"><input type="radio" name="dec-outcome" value="redress-denied"> Redress Denied</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Chairman's Name</label>
+          <input type="text" id="dec-chairman" placeholder="Name of the chairman">
+        </div>
+      </div>
+
+      <div style="margin-top:20px; display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="generateDecision()">✍️ Generate Written Decision</button>
+        <button class="btn btn-secondary" onclick="enhanceDecisionAI()">🤖 AI-Enhanced Version</button>
+        <button class="btn btn-secondary" onclick="clearDecision()">Clear</button>
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:9px; line-height:1.55; background:var(--bg-alt); border-radius:7px; padding:9px 12px; border-left:3px solid var(--amber);">
+        <strong style="color:var(--navy);">🤖 AI-Enhanced Version</strong> creates a second version with suggested standard wording — it appears in the AI panel on the right. Your facts and outcome remain unchanged; only the language is refined to match the recommended structure for written decisions at all levels of competition.
+      </p>
+
+      <div id="decisionOutput" style="display:none">
+        <h3 class="sub-sub" style="margin-top:24px; margin-bottom:8px;">📄 Generated Written Decision</h3>
+        <div class="decision-output" id="decisionText">
+          <button class="copy-btn" onclick="copyDecision()">Copy</button>
+          <span id="decisionContent"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DECISION EXAMPLES -->
+    <div class="section" id="section-decision-examples">
+      <div class="page-title">Decision Examples</div>
+      <div class="page-subtitle">Standard format decisions for reference</div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'ex-protest')">Protest Decision</button>
+        <button class="tab-btn" onclick="switchTab(this,'ex-redress')">Redress Decision</button>
+        <button class="tab-btn" onclick="switchTab(this,'ex-invalid')">Invalid Protest</button>
+      </div>
+
+      <div class="tab-content active" id="tab-ex-protest">
+        <h3 class="sub-sub">Example — Protest Upheld (Rule 11)</h3>
+        <div class="decision-output">
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+WRITTEN DECISION OF THE PROTEST COMMITTEE
+
+Event:     Laser Fleet Championship 2025
+Race:      Race 3
+Date:      15 July 2025
+Hearing:   Protest
+
+Protest Committee: A. Judge (Chairman), B. Brown, C. Smith
+
+Protestor:  GBR 123 (Blue Boat), John Sailor
+Protestee:  GBR 456 (Red Boat), Jane Helm
+
+FACTS FOUND
+
+On the run to the leeward mark, GBR 123 (leeward boat) and GBR 456 (windward boat) were sailing on port tack in close proximity. GBR 456 was to windward of GBR 123 and was overlapping. GBR 456 was not keeping clear. GBR 456 made contact with GBR 123, resulting in damage to GBR 123's spinnaker pole.
+
+GBR 456 did not take a penalty at the time of the incident.
+
+RULES THAT APPLY
+
+Rule 11 (On the Same Tack, Overlapped): When boats are on the same tack and overlapped, a windward boat shall keep clear of a leeward boat.
+
+Rule 14 (Avoiding Contact): A boat shall avoid contact with another boat if reasonably possible.
+
+DECISION
+
+GBR 456 broke rule 11 by failing to keep clear of GBR 123 as required when boats are on the same tack and overlapped. GBR 456 also broke rule 14 by failing to avoid contact when it was reasonably possible to do so.
+
+GBR 456 is DISQUALIFIED from Race 3.
+
+Parties are reminded that they have a right of appeal to Sail Canada (appeals@sailing.ca) within 15 days of receipt of this written decision, provided that no no-appeal protest committee or international jury was in place.
+
+Signed: A. Judge (Chairman)   Date: 15 July 2025
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-ex-redress">
+        <h3 class="sub-sub">Example — Redress Granted (Rule 62.1(b))</h3>
+        <div class="decision-output">
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+WRITTEN DECISION OF THE PROTEST COMMITTEE
+
+Event:     Regional Offshore Series 2025
+Race:      Race 2
+Date:      22 August 2025
+Hearing:   Request for Redress
+
+Protest Committee: A. Judge (Chairman), B. Brown, C. Smith
+
+Requesting Boat: CAN 99 (Windy), Peter Captain
+Other Party:     Race Committee
+
+FACTS FOUND
+
+CAN 99 was one of 12 boats racing. The race committee displayed an individual recall signal for CAN 99 at the start. Upon review of the race committee's video evidence and the GPS track of CAN 99, the protest committee finds that CAN 99 was not over the line at the start. The recall was incorrectly issued. CAN 99, having been signalled to return, re-started and finished in 9th place. Had she not been recalled, she would have finished in 2nd place.
+
+RULES THAT APPLY
+
+Rule 62.1(b): A boat may request redress if her score has been significantly worsened through an improper action or omission of the race committee.
+
+Rule 64.2: When the protest committee decides that a boat is entitled to redress, it shall make as equitable an arrangement as possible for all boats affected, which may be to adjust the boat's score.
+
+DECISION
+
+The protest committee finds that:
+(a) The race committee made an improper action by incorrectly recalling CAN 99;
+(b) CAN 99's finishing position was significantly worsened through no fault of CAN 99;
+(c) Redress is deserved.
+
+CAN 99 is awarded 2nd place in Race 2. All other boats' finishing positions remain unchanged.
+
+Parties are reminded of their right of appeal to Sail Canada (appeals@sailing.ca) within 15 days.
+
+Signed: A. Judge (Chairman)   Date: 22 August 2025
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-ex-invalid">
+        <h3 class="sub-sub">Example — Invalid Protest</h3>
+        <div class="decision-output">
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+WRITTEN DECISION OF THE PROTEST COMMITTEE
+
+Event:     Club Wednesday Evening Race Series
+Race:      Race 7
+Date:      9 July 2025
+Hearing:   Protest (Validity Hearing)
+
+Protest Committee: A. Judge (Chairman), B. Brown
+
+Protestor:  CAN 55 (Fast Boat), Tom Helm
+Protestee:  CAN 77 (Quick Boat), Sue Skipper
+
+FACTS FOUND
+
+A protest was received from CAN 55 against CAN 77. The time limit for delivery of protests was 1800 hours. The protest was delivered to the race office at 1832 hours.
+
+The protestor stated that he was unaware of the time limit. No exceptional circumstances were put forward that would have prevented timely delivery.
+
+RULES THAT APPLY
+
+Rule 61.3: A protest shall be delivered to the race office within the time limit specified in the sailing instructions.
+
+Rule 63.5: If the protest committee decides that a protest is invalid, it shall so inform the parties and close the hearing.
+
+DECISION
+
+The protest was delivered after the time limit. No grounds exist to waive the time limit requirement under rule 63.5. The protest is INVALID.
+
+This hearing is closed.
+
+Note: Parties are advised that a decision on invalidity may itself be appealed to Sail Canada (appeals@sailing.ca) within 15 days.
+
+Signed: A. Judge (Chairman)   Date: 9 July 2025
+        </div>
+      </div>
+    </div>
+
+    <!-- KEY RULES -->
+    <div class="section" id="section-key-rules">
+      <div class="page-title">Key Rules — Quick Reference</div>
+      <div class="page-subtitle">The rules most commonly applied in hearings</div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'rules-part2')">Part 2 Rules</button>
+        <button class="tab-btn" onclick="switchTab(this,'rules-part5')">Part 5 Procedure</button>
+        <button class="tab-btn" onclick="switchTab(this,'rules-sailcanada')">Sail Canada Prescriptions</button>
+      </div>
+
+      <div class="tab-content active" id="tab-rules-part2">
+        <h3 class="sub-sub">Part 2 — When Boats Meet</h3>
+        <table class="compare-table">
+          <tr><th>Rule</th><th>Subject</th><th>Key Requirement</th></tr>
+          <tr><td><span class="rule-ref">10</span></td><td>On Opposite Tacks</td><td>A port-tack boat shall keep clear of a starboard-tack boat.</td></tr>
+          <tr><td><span class="rule-ref">11</span></td><td>On Same Tack, Overlapped</td><td>A windward boat shall keep clear of a leeward boat.</td></tr>
+          <tr><td><span class="rule-ref">12</span></td><td>On Same Tack, Not Overlapped</td><td>A boat clear astern shall keep clear of a boat clear ahead.</td></tr>
+          <tr><td><span class="rule-ref">13</span></td><td>While Tacking</td><td>A boat tacking shall keep clear of boats not tacking until she is on a close-hauled course.</td></tr>
+          <tr><td><span class="rule-ref">14</span></td><td>Avoiding Contact</td><td>A boat shall avoid contact with another boat if reasonably possible.</td></tr>
+          <tr><td><span class="rule-ref">15</span></td><td>Acquiring Right of Way</td><td>When a boat acquires right of way, she shall initially give the other boat room to keep clear.</td></tr>
+          <tr><td><span class="rule-ref">16</span></td><td>Changing Course</td><td>When a right-of-way boat changes course, she shall give the keep-clear boat room to keep clear.</td></tr>
+          <tr><td><span class="rule-ref">17</span></td><td>On Same Tack; Proper Course</td><td>A boat that becomes overlapped to leeward within two of her hull lengths shall not sail above her proper course.</td></tr>
+          <tr><td><span class="rule-ref">18</span></td><td>Mark-Room</td><td>When boats are about to round or pass a mark, the outside boat shall give the inside boat mark-room.</td></tr>
+          <tr><td><span class="rule-ref">19</span></td><td>Room to Pass an Obstruction</td><td>A right-of-way boat shall give room to pass an obstruction to a boat that is entitled to room.</td></tr>
+          <tr><td><span class="rule-ref">20</span></td><td>Room to Tack at an Obstruction</td><td>A boat may hail for room to tack at an obstruction when she is sailing close-hauled or above.</td></tr>
+          <tr><td><span class="rule-ref">21</span></td><td>Exoneration</td><td>A boat shall be exonerated if she breaks a rule of Part 2 while taking room she is entitled to.</td></tr>
+        </table>
+      </div>
+
+      <div class="tab-content" id="tab-rules-part5">
+        <h3 class="sub-sub">Part 5 — Protests, Redress, Hearings</h3>
+        <table class="compare-table">
+          <tr><th>Rule</th><th>Subject</th><th>Key Point</th></tr>
+          <tr><td><span class="rule-ref">60</span></td><td>Right to Protest; Redress</td><td>A boat, race committee, technical committee or protest committee may protest; protest committee may initiate redress.</td></tr>
+          <tr><td><span class="rule-ref">61</span></td><td>Protest Requirements</td><td>Hail, flag, and written protest within time limit required.</td></tr>
+          <tr><td><span class="rule-ref">62</span></td><td>Redress</td><td>Grounds: physical damage/injury (a), RC improper action (b), help to person in danger (c), outside act (d).</td></tr>
+          <tr><td><span class="rule-ref">63</span></td><td>Hearings</td><td>Parties present, right to question witnesses, committee deliberates in private.</td></tr>
+          <tr><td><span class="rule-ref">64</span></td><td>Penalties and Exoneration</td><td>One penalty per incident; exoneration if compelled to break rule.</td></tr>
+          <tr><td><span class="rule-ref">65</span></td><td>Informing the Decision</td><td>Written decision with facts, rules, decision on request. Parties informed of appeal right.</td></tr>
+          <tr><td><span class="rule-ref">66</span></td><td>Reopening a Hearing</td><td>A party may request reopening if new evidence or a significant error is identified.</td></tr>
+          <tr><td><span class="rule-ref">70</span></td><td>Appeals</td><td>Party may appeal on question of rule application to national authority.</td></tr>
+          <tr><td><span class="rule-ref">71</span></td><td>Appeal Decision</td><td>National authority may uphold, change, or refer back. Decision is final.</td></tr>
+        </table>
+      </div>
+
+      <div class="tab-content" id="tab-rules-sailcanada">
+        <h3 class="sub-sub">Sail Canada Prescriptions 2025–2028</h3>
+        <table class="compare-table">
+          <tr><th>Rule</th><th>Sail Canada Prescription</th></tr>
+          <tr><td><span class="rule-ref">Rule 46</span></td><td>The designated person in charge, if resident in Canada, shall be a member of Sail Canada through a club affiliated to Sail Canada or their Provincial Sailing Association.</td></tr>
+          <tr><td><span class="rule-ref">Part 5</span></td><td>No fee shall be charged for any procedure of the protest committee under Part 5 or Appendix T.</td></tr>
+          <tr><td><span class="rule-ref">Rule 65.1</span></td><td>A boat found to have broken a rule and caused damage shall be considered at fault for the purposes of rule 65.1.</td></tr>
+          <tr><td><span class="rule-ref">Rule 70.3(b)</span></td><td>Sail Canada so prescribes — a party may request review of whether procedural requirements were met.</td></tr>
+          <tr><td><span class="rule-ref">Rule 86.3</span></td><td>Sail Canada so prescribes.</td></tr>
+          <tr><td><span class="rule-ref">Rule 88.2</span></td><td>Prescriptions to Part 5 and rule 65.1 may not be changed or deleted. Other prescriptions may be changed only if a no-appeal committee or international jury is appointed.</td></tr>
+          <tr><td><span class="rule-ref">Rule 91(b)</span></td><td>Before requesting a three-member international jury, written approval must be obtained from Sail Canada at appeals@sailing.ca.</td></tr>
+          <tr><td><span class="rule-ref">Appendix R</span></td><td>Submit appeals to appeals@sailing.ca. Sail Canada may delegate to a provincial appeals committee; decisions of the provincial committee may be further appealed to Sail Canada.</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </main><!-- end main -->
+
+  <!-- AI CHAT PANEL -->
+  <div class="ai-panel">
+    <div class="ai-panel-header">
+      <div>
+        <h3>⚓ AI Rules Assistant</h3>
+        <p>Answers drawn from RRS 2025–2028, Judges' Manual, Case Book &amp; Sail Canada Prescriptions</p>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg system">
+        Hello, Judge. I'm your rules assistant. Ask me anything about protest procedures, redress hearings, appeals, or rule interpretation under the Racing Rules of Sailing 2025–2028 and Sail Canada Prescriptions.<br><br>
+        <strong>To enable this assistant, set your API key</strong> using the button in the top right corner.
+      </div>
+    </div>
+    <div class="chat-input-area">
+
+      <div class="ai-instructions">
+        <div class="ai-instructions-title">💬 Ask in Plain Language</div>
+        <p>Type any question about protest procedure, redress, appeals, or rule interpretation. No legal language needed — ask exactly as you would ask a colleague.</p>
+        <div class="ai-instructions-tip">
+          💡 <strong>More detail = better answer.</strong> Instead of <em>"rule 18?"</em> try <em>"Does rule 18 apply when two boats on port tack are approaching the leeward mark and one becomes overlapped inside the zone?"</em>
+        </div>
+      </div>
+
+      <div class="quick-questions">
+        <span class="quick-q" onclick="sendQuickQ('What makes a protest invalid under rules 61.2 and 63.5?')">Invalid protest?</span>
+        <span class="quick-q" onclick="sendQuickQ('What are the four grounds for redress under rule 62?')">Redress grounds</span>
+        <span class="quick-q" onclick="sendQuickQ('When can a party appeal a protest committee decision under rule 70?')">Right of appeal</span>
+        <span class="quick-q" onclick="sendQuickQ('Explain the difference between a protest and a request for redress')">Protest vs redress</span>
+        <span class="quick-q" onclick="sendQuickQ('What must a written decision contain under rule 65?')">Written decision</span>
+        <span class="quick-q" onclick="sendQuickQ('Can a protest committee reopen a hearing under rule 66, and on what grounds?')">Reopen hearing</span>
+      </div>
+
+      <div class="chat-input-row">
+        <textarea id="chatInput" placeholder="e.g. When does rule 18 apply at a leeward mark with overlapping boats?" rows="1" onkeydown="handleKey(event)"></textarea>
+        <button id="sendBtn" onclick="sendMessage()">➤</button>
+      </div>
+      <div class="cost-note">~$0.001–0.005 USD per question · Billed to your Anthropic account · Author receives no fees</div>
+    </div>
+  </div>
+
+</div><!-- end app-layout -->
+
+<script>
+// ── STATE ──
+let apiKey = localStorage.getItem('judges_api_key') || '';
+let chatHistory = [];
+
+// ── MOBILE SIDEBAR ──
+function toggleSidebar() {
+  document.querySelector('nav.sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('nav.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+function setMobileActive(el) {
+  document.querySelectorAll('.mobile-nav-item').forEach(function(i){ i.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+// ── INIT ──
+window.onload = () => {
+  if (apiKey) {
+    document.getElementById('apiStatusBtn').textContent = '🔑 API Key Set';
+    document.getElementById('apiStatusBtn').classList.add('connected');
+  } else {
+    // Show modal on first load
+    setTimeout(() => openModal(), 600);
+  }
+};
+
+// ── API KEY MODAL ──
+function openModal() { document.getElementById('apiModal').classList.add('open'); }
+function closeModal() { document.getElementById('apiModal').classList.remove('open'); }
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (key) {
+    apiKey = key;
+    localStorage.setItem('judges_api_key', key);
+    document.getElementById('apiStatusBtn').textContent = '✅ API Key Set';
+    document.getElementById('apiStatusBtn').classList.add('connected');
+    addMessage('system', 'API key saved. I\'m ready to answer your questions about the Racing Rules of Sailing, protest procedures, and more.');
+  }
+  closeModal();
+}
+
+// ── NAVIGATION ──
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  var sec = document.getElementById('section-' + id);
+  if (sec) sec.classList.add('active');
+  var nav = document.querySelector('[data-section="' + id + '"]');
+  if (nav) nav.classList.add('active');
+  closeSidebar();
+  var m = document.querySelector('main');
+  if (m) m.scrollTop = 0;
+}
+
+// ── TABS ──
+function switchTab(btn, tabId) {
+  const parent = btn.closest('.section') || document.body;
+  parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  parent.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const tab = document.getElementById('tab-' + tabId);
+  if (tab) tab.classList.add('active');
+}
+
+// ── CHECKLIST ──
+function toggleCheck(li) {
+  li.classList.toggle('checked');
+  const box = li.querySelector('.check-box');
+  box.textContent = li.classList.contains('checked') ? '✓' : '';
+}
+
+function resetAllChecklists(prefix) {
+  document.querySelectorAll('[id^="checklist-' + prefix + '"]').forEach(list => {
+    list.querySelectorAll('li').forEach(li => {
+      li.classList.remove('checked');
+      li.querySelector('.check-box').textContent = '';
+    });
+  });
+}
+
+// ── SYSTEM PROMPT ──
+const SYSTEM_PROMPT = `You are a procedural assistant for judges in the sport of sailing. You are an expert in:
+1. The Racing Rules of Sailing 2025–2028 (RRS)
+2. The World Sailing Judges' Manual
+3. The World Sailing Case Book 2021–2024
+4. Sail Canada Prescriptions to the RRS 2025–2028
+
+Your role is to help judges — from club level to international level — follow the correct procedural processes for protests, requests for redress, and appeals. You help judges focus on applying the rules correctly rather than getting confused by process.
+
+CRITICAL RULES FOR YOUR RESPONSES:
+- Use ONLY the terminology found in the RRS and the provided documents. Do not substitute alternative wording.
+- Cite rule numbers when giving answers (e.g., "rule 61.2", "rule 63.5", "Appendix R").
+- Write at a clear, college level — straightforward and direct.
+- Do not create ambiguity by using alternative terminology.
+- When discussing Sail Canada events, include relevant Sail Canada Prescriptions.
+- If you are uncertain about a fact, say so clearly rather than guessing.
+- Keep answers focused and practical for the judge's immediate needs.
+- Where a World Sailing Case is relevant, refer to it by number.
+- Always remind judges that they should have the actual RRS documents available for authoritative reference.
+
+Key Sail Canada contact: appeals@sailing.ca`;
+
+// ── AI CHAT ──
+function addMessage(role, text) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>').replace(/rule (\d+[\.\d]*[a-z]?)/gi, (m,r) => `${m} <span class="rule-ref">${r}</span>`);
+  document.getElementById('chatMessages').appendChild(div);
+  document.getElementById('chatMessages').scrollTop = 999999;
+  return div;
+}
+
+function addLoadingMsg() {
+  const div = document.createElement('div');
+  div.className = 'msg loading';
+  div.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  document.getElementById('chatMessages').appendChild(div);
+  document.getElementById('chatMessages').scrollTop = 999999;
+  return div;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!apiKey) { openModal(); return; }
+
+  input.value = '';
+  document.getElementById('sendBtn').disabled = true;
+  addMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  const loading = addLoadingMsg();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: chatHistory
+      })
+    });
+
+    const data = await response.json();
+    loading.remove();
+
+    if (data.error) {
+      addMessage('system', '⚠️ API Error: ' + (data.error.message || 'Unknown error. Please check your API key.'));
+      chatHistory.pop();
+    } else {
+      const reply = data.content.map(c => c.text || '').join('\n');
+      chatHistory.push({ role: 'assistant', content: reply });
+      addMessage('assistant', reply);
+    }
+  } catch (err) {
+    loading.remove();
+    addMessage('system', '⚠️ Network error. Please check your connection and API key.');
+    chatHistory.pop();
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function sendQuickQ(q) {
+  document.getElementById('chatInput').value = q;
+  sendMessage();
+}
+
+// ── DECISION WRITER ──
+function generateDecision() {
+  const event = document.getElementById('dec-event').value || '[Event Name]';
+  const race = document.getElementById('dec-race').value || '[Race Number]';
+  const date = document.getElementById('dec-date').value || '[Date]';
+  const type = document.getElementById('dec-type').value;
+  const protestor = document.getElementById('dec-protestor').value || '[Protestor]';
+  const protestee = document.getElementById('dec-protestee').value || '[Protestee]';
+  const committee = document.getElementById('dec-committee').value || '[Committee Members]';
+  const rulesAlleged = document.getElementById('dec-rules-alleged').value || '[Rules Alleged]';
+  const facts = document.getElementById('dec-facts').value || '[Facts Found]';
+  const rulesApplied = document.getElementById('dec-rules-applied').value || '[Rules Applied]';
+  const conclusion = document.getElementById('dec-conclusion').value || '[Decision]';
+  const chairman = document.getElementById('dec-chairman').value || '[Chairman]';
+  const outcomeEl = document.querySelector('input[name="dec-outcome"]:checked');
+  const outcome = outcomeEl ? outcomeEl.value : 'upheld';
+
+  const typeLabels = { protest: 'Protest', redress: 'Request for Redress', appeal: 'Appeal' };
+  const typeLabel = typeLabels[type] || 'Protest';
+
+  let partyLabel1 = type === 'redress' ? 'Requesting Boat' : 'Protestor';
+  let partyLabel2 = type === 'redress' ? 'Other Party' : 'Protestee';
+
+  let outcomeText = '';
+  if (outcome === 'upheld') outcomeText = 'The protest is UPHELD.';
+  else if (outcome === 'dismissed') outcomeText = 'The protest is DISMISSED.';
+  else if (outcome === 'invalid') outcomeText = 'The protest is INVALID. This hearing is closed.';
+  else if (outcome === 'redress-granted') outcomeText = 'The request for redress is GRANTED.';
+  else if (outcome === 'redress-denied') outcomeText = 'The request for redress is DENIED.';
+
+  const appeal_note = outcome === 'invalid'
+    ? 'Note: A decision on invalidity may itself be appealed to Sail Canada (appeals@sailing.ca) within 15 days of receipt of this written decision.'
+    : 'Parties are reminded that they have a right of appeal to Sail Canada (appeals@sailing.ca) within 15 days of receipt of this written decision, provided that no no-appeal protest committee or international jury was in place for this event.';
+
+  const text = `WRITTEN DECISION OF THE PROTEST COMMITTEE
+
+Event:     ${event}
+Race:      ${race}
+Date:      ${date}
+Hearing:   ${typeLabel}
+
+Protest Committee: ${committee}
+
+${partyLabel1}:  ${protestor}
+${partyLabel2}:  ${protestee}
+
+FACTS FOUND
+
+${facts}
+
+RULES THAT APPLY
+
+${rulesAlleged ? 'Rules alleged: ' + rulesAlleged + '\n\n' : ''}${rulesApplied}
+
+DECISION
+
+${conclusion}
+
+${outcomeText}
+
+${appeal_note}
+
+Signed: ${chairman} (Chairman)   Date: ${date}`;
+
+  document.getElementById('decisionContent').textContent = text;
+  document.getElementById('decisionOutput').style.display = 'block';
+  document.getElementById('decisionOutput').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function enhanceDecisionAI() {
+  if (!apiKey) { openModal(); return; }
+
+  const facts = document.getElementById('dec-facts').value;
+  const rulesApplied = document.getElementById('dec-rules-applied').value;
+  const conclusion = document.getElementById('dec-conclusion').value;
+  const type = document.getElementById('dec-type').value;
+
+  if (!facts || !conclusion) {
+    addMessage('system', 'Please fill in the Facts Found and Decision fields first, then click AI-Enhanced Version.');
+    return;
+  }
+
+  const prompt = `I am a judge writing a written decision for a sailing ${type}. Please review my draft and produce an improved version using the standard format required by the Racing Rules of Sailing rule 65.1. Use only the terminology from the RRS 2025–2028. Do not change the facts or outcome, only improve the clarity and legal precision of the language.
+
+Facts Found: ${facts}
+Rules Applied: ${rulesApplied}
+Decision/Conclusion: ${conclusion}
+
+Please produce the improved text for the FACTS FOUND, RULES THAT APPLY, and DECISION sections only.`;
+
+  addMessage('user', '(Requesting AI-enhanced decision draft...)');
+  const loading = addLoadingMsg();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    loading.remove();
+
+    if (data.error) {
+      addMessage('system', '⚠️ API Error: ' + (data.error.message || 'Unknown error.'));
+    } else {
+      const reply = data.content.map(c => c.text || '').join('\n');
+      addMessage('assistant', '**AI-Enhanced Decision Sections:**\n\n' + reply);
+    }
+  } catch (err) {
+    loading.remove();
+    addMessage('system', '⚠️ Network error.');
+  }
+}
+
+function clearDecision() {
+  ['dec-event','dec-race','dec-date','dec-protestor','dec-protestee','dec-committee',
+   'dec-rules-alleged','dec-facts','dec-rules-applied','dec-conclusion','dec-chairman'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.querySelectorAll('input[name="dec-outcome"]').forEach(r => r.checked = false);
+  document.getElementById('decisionOutput').style.display = 'none';
+}
+
+function copyDecision() {
+  const text = document.getElementById('decisionContent').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function copyText(btn) {
+  const container = btn.nextSibling || btn.parentElement;
+  const text = btn.parentElement.textContent.replace('Copy','').replace('Copied!','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+</script>
+</body>
+</html>
